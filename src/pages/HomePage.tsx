@@ -5,6 +5,7 @@ import { PageContainer } from '@/components/layout/PageContainer';
 import { BalanceCard } from '@/components/home/BalanceCard';
 import { CoverageAlert } from '@/components/home/CoverageAlert';
 import { TransferAlert } from '@/components/home/TransferAlert';
+import { PendingTransactionsAlert } from '@/components/home/PendingTransactionsAlert';
 import { MonthSelector } from '@/components/transactions/MonthSelector';
 import { StatementList } from '@/components/transactions/StatementList';
 import { StatementFilter, FilterOptions } from '@/components/transactions/StatementFilter';
@@ -15,6 +16,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useStatement, isConsolidatedInvoice } from '@/hooks/useStatement';
+import { usePaymentStatus } from '@/hooks/usePaymentStatus';
 import { useTransactions, TransferResult } from '@/hooks/useTransactions';
 import { useCreditCards } from '@/hooks/useCreditCards';
 import { useInvestments } from '@/hooks/useInvestments';
@@ -40,6 +42,7 @@ export default function HomePage() {
   // Alert states
   const [coverageInfo, setCoverageInfo] = useState<{ amount: number; investmentName: string } | null>(null);
   const [transferInfo, setTransferInfo] = useState<{ amount: number; investmentName: string } | null>(null);
+  const [showPendingAlert, setShowPendingAlert] = useState(true);
 
   // Use the new statement hook for display
   const { items, loading, totals, balance, balanceData, refresh: refreshStatement } = useStatement(month);
@@ -49,6 +52,24 @@ export default function HomePage() {
   const { cards } = useCreditCards();
   const { refresh: refreshInvestments } = useInvestments();
   const { settings, toggleBalanceYield } = useSettings();
+  const { isPaid, isOverdue, toggleStatus } = usePaymentStatus();
+
+  // Compute pending (unpaid) expense transactions for alert
+  const pendingItems = useMemo(() => {
+    if (!showPendingAlert) return [];
+    return items
+      .filter(item => {
+        if (isConsolidatedInvoice(item)) return false;
+        if (item.type !== 'expense') return false;
+        return !isPaid(item.id);
+      })
+      .map(item => ({
+        id: item.id,
+        description: (item as Transaction).description || 'Despesa',
+        amount: (item as Transaction).amount,
+        isOverdue: isOverdue(item.id, (item as Transaction).date),
+      }));
+  }, [items, isPaid, isOverdue, showPendingAlert]);
 
   // Check and record month-end balance when viewing past months
   useEffect(() => {
@@ -277,6 +298,17 @@ export default function HomePage() {
             amount={transferInfo.amount}
             investmentName={transferInfo.investmentName}
             onDismiss={() => setTransferInfo(null)}
+          />
+        )}
+
+        {/* Pending Transactions Alert */}
+        {showPendingAlert && pendingItems.length > 0 && (
+          <PendingTransactionsAlert
+            items={pendingItems}
+            onTogglePaid={(id) => {
+              toggleStatus(id);
+            }}
+            onDismiss={() => setShowPendingAlert(false)}
           />
         )}
 
