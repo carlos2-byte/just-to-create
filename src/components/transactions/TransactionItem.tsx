@@ -105,7 +105,11 @@ export function TransactionItem({
   const showStatusIndicator = transaction.type === 'expense' && onTogglePaid;
 
   return (
-    <div className="flex items-center gap-2 py-2 group">
+    <div className={cn(
+      "flex items-center gap-2 py-2 group rounded-lg px-1 transition-colors",
+      showStatusIndicator && !isPaid && isOverdue && "bg-destructive/10",
+      showStatusIndicator && !isPaid && !isOverdue && "bg-warning/10",
+    )}>
       {/* Payment status indicator */}
       {showStatusIndicator && (
         <button
