@@ -59,19 +59,25 @@ export default function HomePage() {
     if (!showPendingAlert) return [];
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    const twoDaysFromNow = new Date(today);
-    twoDaysFromNow.setDate(twoDaysFromNow.getDate() + 2);
+
+    // Calculate date that is 2 business days from now
+    const twoBizDaysFromNow = new Date(today);
+    let bizDaysAdded = 0;
+    while (bizDaysAdded < 2) {
+      twoBizDaysFromNow.setDate(twoBizDaysFromNow.getDate() + 1);
+      const dow = twoBizDaysFromNow.getDay();
+      if (dow !== 0 && dow !== 6) bizDaysAdded++;
+    }
 
     return items
       .filter(item => {
         if (isConsolidatedInvoice(item)) return false;
         if (item.type !== 'expense') return false;
         if (isPaid(item.id)) return false;
-        // Only show if due within 2 days (or already overdue)
         const tx = item as Transaction;
         const [y, m, d] = tx.date.split('-').map(Number);
         const dueDate = new Date(y, m - 1, d);
-        return dueDate <= twoDaysFromNow;
+        return dueDate <= twoBizDaysFromNow;
       })
       .map(item => ({
         id: item.id,
