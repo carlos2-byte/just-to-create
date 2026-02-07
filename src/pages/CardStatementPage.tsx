@@ -217,6 +217,7 @@ export default function CardStatementPage() {
                 onDelete={handleDeleteTransaction}
                 onEdit={handleEditTransaction}
                 showActions
+                showPurchaseDate
                 emptyMessage="Nenhuma compra neste período"
               />
             </CardContent>

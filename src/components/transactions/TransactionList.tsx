@@ -9,6 +9,8 @@ interface TransactionListProps {
   onEdit?: (transaction: Transaction) => void;
   showActions?: boolean;
   emptyMessage?: string;
+  /** When true, show purchase date instead of invoice due date */
+  showPurchaseDate?: boolean;
 }
 
 export function TransactionList({
@@ -18,6 +20,7 @@ export function TransactionList({
   onEdit,
   showActions = false,
   emptyMessage = 'Nenhuma transação encontrada',
+  showPurchaseDate = false,
 }: TransactionListProps) {
   if (loading) {
     return (
@@ -53,6 +56,7 @@ export function TransactionList({
           onDelete={onDelete}
           onEdit={onEdit}
           showActions={showActions}
+          showPurchaseDate={showPurchaseDate}
         />
       ))}
     </div>

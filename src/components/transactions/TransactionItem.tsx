@@ -40,6 +40,8 @@ interface TransactionItemProps {
   isPaid?: boolean;
   isOverdue?: boolean;
   onTogglePaid?: (id: string) => void;
+  /** When true, always show the purchase date instead of the invoice due date */
+  showPurchaseDate?: boolean;
 }
 
 /**
@@ -73,6 +75,7 @@ export function TransactionItem({
   isPaid = false,
   isOverdue = false,
   onTogglePaid,
+  showPurchaseDate = false,
 }: TransactionItemProps) {
   const [displayDate, setDisplayDate] = useState<string>(transaction.date);
   const [cardName, setCardName] = useState<string | null>(null);
@@ -84,13 +87,13 @@ export function TransactionItem({
   const isInstallment = transaction.installments && transaction.installments > 1;
   const isCardPayment = transaction.isCardPayment && transaction.cardId;
 
-  // Calculate display date (due date for card payments)
+  // Calculate display date (due date for card payments, unless showPurchaseDate is set)
   useEffect(() => {
     async function calculateDate() {
       if (isCardPayment && transaction.cardId) {
         const card = await getCreditCardById(transaction.cardId);
         if (card) {
-          setDisplayDate(getDisplayDate(transaction, card));
+          setDisplayDate(showPurchaseDate ? transaction.date : getDisplayDate(transaction, card));
           setCardName(card.name);
         }
       } else {
@@ -99,7 +102,7 @@ export function TransactionItem({
       }
     }
     calculateDate();
-  }, [transaction, isCardPayment]);
+  }, [transaction, isCardPayment, showPurchaseDate]);
 
   // Only show status indicator for expenses
   const showStatusIndicator = transaction.type === 'expense' && onTogglePaid;
