@@ -8,10 +8,11 @@ export function SplashScreen({ onComplete }: SplashScreenProps) {
   const [phase, setPhase] = useState(0);
 
   useEffect(() => {
-    const t1 = setTimeout(() => setPhase(1), 100);   // pig fade-in
-    const t2 = setTimeout(() => setPhase(2), 500);   // graph line + coins
-    const t3 = setTimeout(() => setPhase(3), 1200);  // text appears
-    const t4 = setTimeout(onComplete, 2200);          // done
+    // Phase 0: mount (bg fade)
+    const t1 = setTimeout(() => setPhase(1), 100);   // start bg fade
+    const t2 = setTimeout(() => setPhase(2), 600);   // start pig draw
+    const t3 = setTimeout(() => setPhase(3), 1400);  // coin + chart + text
+    const t4 = setTimeout(onComplete, 2200);          // navigate
 
     return () => {
       clearTimeout(t1);
@@ -22,115 +23,234 @@ export function SplashScreen({ onComplete }: SplashScreenProps) {
   }, [onComplete]);
 
   return (
-    <div className="fixed inset-0 z-50 flex flex-col items-center justify-center overflow-hidden select-none"
+    <div
+      className="fixed inset-0 z-50 flex flex-col items-center justify-center overflow-hidden select-none"
       style={{
-        background: 'linear-gradient(180deg, #0a1628 0%, #0f2035 30%, #124a2e 70%, #1a6b3c 100%)',
+        background: 'linear-gradient(180deg, #0a1a3a 0%, #0d2a5c 40%, #102e6a 70%, #0a1a3a 100%)',
+        opacity: phase >= 1 ? 1 : 0,
+        transition: 'opacity 0.5s ease-out',
       }}
     >
-      {/* Central content */}
-      <div className="relative flex flex-col items-center">
-        {/* Pig + Graph container */}
-        <div className="relative w-64 h-48 flex items-center justify-center">
-          {/* Pig */}
-          <svg
-            viewBox="0 0 120 110"
-            className="w-32 h-28 transition-all duration-700 ease-out"
+      {/* Soft center glow */}
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          background: 'radial-gradient(ellipse 60% 50% at 50% 48%, rgba(60,130,246,0.12) 0%, transparent 70%)',
+        }}
+      />
+
+      {/* Main content area */}
+      <div className="relative flex items-center justify-center" style={{ width: 280, height: 200 }}>
+        {/* Piggy bank outline - drawn effect */}
+        <svg
+          viewBox="0 0 160 140"
+          className="absolute"
+          style={{ width: 160, height: 140, left: 20, top: 20 }}
+        >
+          {/* Pig body */}
+          <ellipse
+            cx="70" cy="75" rx="42" ry="34"
+            fill="none"
+            stroke="white"
+            strokeWidth="2.5"
+            strokeLinecap="round"
             style={{
-              opacity: phase >= 1 ? 1 : 0,
-              transform: phase >= 1 ? 'scale(1) translateY(0)' : 'scale(0.8) translateY(20px)',
+              strokeDasharray: 240,
+              strokeDashoffset: phase >= 2 ? 0 : 240,
+              transition: 'stroke-dashoffset 0.8s ease-out',
             }}
-          >
-            {/* Body */}
-            <ellipse cx="60" cy="60" rx="38" ry="30" fill="white" opacity="0.95" />
-            {/* Head */}
-            <circle cx="88" cy="48" r="20" fill="white" opacity="0.95" />
-            {/* Snout */}
-            <ellipse cx="103" cy="50" rx="9" ry="7" fill="rgba(255,255,255,0.7)" stroke="white" strokeWidth="1.5" />
-            {/* Nostrils */}
-            <circle cx="100" cy="49" r="1.8" fill="rgba(10,22,40,0.4)" />
-            <circle cx="106" cy="49" r="1.8" fill="rgba(10,22,40,0.4)" />
-            {/* Ears */}
-            <ellipse cx="76" cy="30" rx="8" ry="12" fill="white" opacity="0.9" />
-            <ellipse cx="92" cy="28" rx="7" ry="11" fill="white" opacity="0.9" />
-            <ellipse cx="76" cy="30" rx="5" ry="7" fill="rgba(255,255,255,0.5)" />
-            <ellipse cx="92" cy="28" rx="4" ry="6" fill="rgba(255,255,255,0.5)" />
-            {/* Eyes */}
-            <circle cx="82" cy="44" r="2.5" fill="rgba(10,22,40,0.6)" />
-            <circle cx="94" cy="42" r="2.5" fill="rgba(10,22,40,0.6)" />
-            <circle cx="83" cy="43" r="0.8" fill="white" />
-            <circle cx="95" cy="41" r="0.8" fill="white" />
-            {/* Smile */}
-            <path d="M 96 56 Q 101 60 106 56" stroke="rgba(10,22,40,0.3)" strokeWidth="1.5" fill="none" strokeLinecap="round" />
-            {/* Legs */}
-            <rect x="32" y="82" width="10" height="14" rx="5" fill="white" opacity="0.9" />
-            <rect x="48" y="82" width="10" height="14" rx="5" fill="white" opacity="0.9" />
-            <rect x="64" y="82" width="10" height="14" rx="5" fill="white" opacity="0.9" />
-            <rect x="80" y="82" width="10" height="14" rx="5" fill="white" opacity="0.9" />
-            {/* Tail */}
-            <path d="M 22 55 Q 12 48 16 58 Q 20 68 12 62" stroke="white" strokeWidth="3" fill="none" strokeLinecap="round" opacity="0.9" />
-            {/* Coin slot on top */}
-            <rect x="50" y="28" width="20" height="3" rx="1.5" fill="rgba(10,22,40,0.15)" />
-          </svg>
+          />
+          {/* Head bump */}
+          <path
+            d="M 95 55 Q 115 35 120 55 Q 122 65 110 72"
+            fill="none"
+            stroke="white"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+            style={{
+              strokeDasharray: 100,
+              strokeDashoffset: phase >= 2 ? 0 : 100,
+              transition: 'stroke-dashoffset 0.8s ease-out 0.1s',
+            }}
+          />
+          {/* Snout */}
+          <ellipse
+            cx="122" cy="62" rx="10" ry="8"
+            fill="none"
+            stroke="white"
+            strokeWidth="2"
+            strokeLinecap="round"
+            style={{
+              strokeDasharray: 60,
+              strokeDashoffset: phase >= 2 ? 0 : 60,
+              transition: 'stroke-dashoffset 0.6s ease-out 0.2s',
+            }}
+          />
+          {/* Nostrils */}
+          <circle cx="119" cy="62" r="1.5" fill="white"
+            style={{ opacity: phase >= 2 ? 1 : 0, transition: 'opacity 0.3s ease-out 0.5s' }} />
+          <circle cx="125" cy="62" r="1.5" fill="white"
+            style={{ opacity: phase >= 2 ? 1 : 0, transition: 'opacity 0.3s ease-out 0.5s' }} />
+          {/* Eye */}
+          <circle cx="105" cy="50" r="2.5" fill="white"
+            style={{ opacity: phase >= 2 ? 1 : 0, transition: 'opacity 0.3s ease-out 0.4s' }} />
+          {/* Ear */}
+          <path
+            d="M 85 42 Q 80 28 90 35"
+            fill="none"
+            stroke="white"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+            style={{
+              strokeDasharray: 30,
+              strokeDashoffset: phase >= 2 ? 0 : 30,
+              transition: 'stroke-dashoffset 0.5s ease-out 0.15s',
+            }}
+          />
+          {/* Legs */}
+          <rect x="40" y="100" width="10" height="16" rx="5" fill="none" stroke="white" strokeWidth="2"
+            style={{
+              strokeDasharray: 50,
+              strokeDashoffset: phase >= 2 ? 0 : 50,
+              transition: 'stroke-dashoffset 0.5s ease-out 0.3s',
+            }}
+          />
+          <rect x="58" y="100" width="10" height="16" rx="5" fill="none" stroke="white" strokeWidth="2"
+            style={{
+              strokeDasharray: 50,
+              strokeDashoffset: phase >= 2 ? 0 : 50,
+              transition: 'stroke-dashoffset 0.5s ease-out 0.35s',
+            }}
+          />
+          <rect x="76" y="100" width="10" height="16" rx="5" fill="none" stroke="white" strokeWidth="2"
+            style={{
+              strokeDasharray: 50,
+              strokeDashoffset: phase >= 2 ? 0 : 50,
+              transition: 'stroke-dashoffset 0.5s ease-out 0.4s',
+            }}
+          />
+          <rect x="94" y="100" width="10" height="16" rx="5" fill="none" stroke="white" strokeWidth="2"
+            style={{
+              strokeDasharray: 50,
+              strokeDashoffset: phase >= 2 ? 0 : 50,
+              transition: 'stroke-dashoffset 0.5s ease-out 0.45s',
+            }}
+          />
+          {/* Tail */}
+          <path
+            d="M 28 68 Q 18 58 22 72 Q 26 82 18 76"
+            fill="none"
+            stroke="white"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+            style={{
+              strokeDasharray: 40,
+              strokeDashoffset: phase >= 2 ? 0 : 40,
+              transition: 'stroke-dashoffset 0.5s ease-out 0.5s',
+            }}
+          />
+          {/* Coin slot */}
+          <line x1="60" y1="40" x2="80" y2="40" stroke="white" strokeWidth="2.5" strokeLinecap="round"
+            style={{
+              strokeDasharray: 20,
+              strokeDashoffset: phase >= 2 ? 0 : 20,
+              transition: 'stroke-dashoffset 0.4s ease-out 0.6s',
+            }}
+          />
+        </svg>
 
-          {/* Falling coins */}
-          {phase >= 2 && (
-            <>
-              <div className="absolute top-0 left-1/2 -translate-x-2" style={{ animation: 'coinFall1 0.8s ease-in forwards' }}>
-                <svg width="16" height="16" viewBox="0 0 16 16">
-                  <circle cx="8" cy="8" r="7" fill="#F6C544" stroke="#D4A22A" strokeWidth="1" />
-                  <text x="8" y="11" textAnchor="middle" fontSize="8" fill="#A67C1A" fontWeight="bold">$</text>
-                </svg>
-              </div>
-              <div className="absolute top-0 left-1/2 translate-x-2" style={{ animation: 'coinFall2 0.9s ease-in 0.15s forwards' }}>
-                <svg width="14" height="14" viewBox="0 0 16 16">
-                  <circle cx="8" cy="8" r="7" fill="#F6C544" stroke="#D4A22A" strokeWidth="1" />
-                  <text x="8" y="11" textAnchor="middle" fontSize="8" fill="#A67C1A" fontWeight="bold">$</text>
-                </svg>
-              </div>
-              <div className="absolute top-0 left-1/2 -translate-x-4" style={{ animation: 'coinFall3 1s ease-in 0.3s forwards' }}>
-                <svg width="12" height="12" viewBox="0 0 16 16">
-                  <circle cx="8" cy="8" r="7" fill="#F6C544" stroke="#D4A22A" strokeWidth="1" />
-                  <text x="8" y="11" textAnchor="middle" fontSize="8" fill="#A67C1A" fontWeight="bold">$</text>
-                </svg>
-              </div>
-            </>
-          )}
-        </div>
-
-        {/* Text */}
+        {/* Bar chart - right side */}
         <div
-          className="mt-6 text-center transition-all duration-700 ease-out"
+          className="absolute flex items-end gap-1"
           style={{
+            right: 0,
+            bottom: 30,
+            height: 70,
             opacity: phase >= 3 ? 1 : 0,
-            transform: phase >= 3 ? 'translateY(0)' : 'translateY(15px)',
+            transition: 'opacity 0.4s ease-out',
           }}
         >
-          <h1 className="text-2xl font-bold tracking-tight" style={{ color: 'rgba(255,255,255,0.95)' }}>
-            Controle$
-          </h1>
-          <p className="mt-2 text-sm tracking-wide" style={{ color: 'rgba(74,222,128,0.8)' }}>
-            Contas, gastos e investimentos
-          </p>
+          {[28, 42, 35, 55, 65].map((h, i) => (
+            <div
+              key={i}
+              className="rounded-sm"
+              style={{
+                width: 8,
+                height: phase >= 3 ? h : 0,
+                background: `rgba(60, 130, 246, ${0.25 + i * 0.08})`,
+                border: '1px solid rgba(100, 160, 255, 0.3)',
+                transition: `height 0.5s ease-out ${i * 0.08}s`,
+              }}
+            />
+          ))}
+          {/* Arrow up */}
+          <svg
+            viewBox="0 0 20 30"
+            className="absolute"
+            style={{
+              width: 16,
+              height: 24,
+              right: -2,
+              top: -18,
+              opacity: phase >= 3 ? 1 : 0,
+              transform: phase >= 3 ? 'translateY(0)' : 'translateY(8px)',
+              transition: 'opacity 0.3s ease-out 0.3s, transform 0.3s ease-out 0.3s',
+            }}
+          >
+            <path d="M 10 28 L 10 6 M 4 12 L 10 4 L 16 12" stroke="rgba(100,180,255,0.7)" strokeWidth="2.5" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </div>
+
+        {/* Falling coin */}
+        <div
+          className="absolute"
+          style={{
+            left: 82,
+            top: phase >= 3 ? 42 : -20,
+            opacity: phase >= 3 ? 1 : 0,
+            transition: 'top 0.5s cubic-bezier(0.34, 1.2, 0.64, 1), opacity 0.2s ease-out',
+          }}
+        >
+          <svg width="20" height="20" viewBox="0 0 24 24">
+            <defs>
+              <linearGradient id="coinGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stopColor="#FFD700" />
+                <stop offset="50%" stopColor="#F6C544" />
+                <stop offset="100%" stopColor="#D4A22A" />
+              </linearGradient>
+            </defs>
+            <circle cx="12" cy="12" r="10" fill="url(#coinGrad)" stroke="#B8860B" strokeWidth="1.5" />
+            <text x="12" y="16" textAnchor="middle" fontSize="11" fill="#8B6914" fontWeight="bold">$</text>
+          </svg>
         </div>
       </div>
 
-      <style>{`
-        @keyframes coinFall1 {
-          0% { transform: translateY(-10px); opacity: 0; }
-          20% { opacity: 1; }
-          100% { transform: translateY(55px); opacity: 0; }
-        }
-        @keyframes coinFall2 {
-          0% { transform: translateY(-10px); opacity: 0; }
-          20% { opacity: 1; }
-          100% { transform: translateY(60px); opacity: 0; }
-        }
-        @keyframes coinFall3 {
-          0% { transform: translateY(-10px); opacity: 0; }
-          20% { opacity: 1; }
-          100% { transform: translateY(50px); opacity: 0; }
-        }
-      `}</style>
+      {/* App name */}
+      <h1
+        className="mt-4 text-3xl font-bold tracking-tight"
+        style={{
+          color: 'rgba(255,255,255,0.95)',
+          opacity: phase >= 3 ? 1 : 0,
+          transform: phase >= 3 ? 'translateY(0)' : 'translateY(12px)',
+          transition: 'opacity 0.5s ease-out 0.2s, transform 0.5s ease-out 0.2s',
+        }}
+      >
+        Controle$
+      </h1>
+
+      {/* Tagline */}
+      <p
+        className="mt-3 text-sm tracking-wide"
+        style={{
+          color: 'rgba(255,255,255,0.7)',
+          fontFamily: 'system-ui, -apple-system, sans-serif',
+          opacity: phase >= 3 ? 1 : 0,
+          transform: phase >= 3 ? 'translateY(0)' : 'translateY(10px)',
+          transition: 'opacity 0.5s ease-out 0.35s, transform 0.5s ease-out 0.35s',
+        }}
+      >
+        Contas, gastos e investimentos
+      </p>
     </div>
   );
 }
