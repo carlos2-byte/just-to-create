@@ -66,7 +66,7 @@ export default function SettingsPage() {
     setIsExporting(true);
     try {
       const data = await exportAllData(includeInvestments);
-      const filename = `financas-pro-backup-${new Date().toISOString().split('T')[0]}.json`;
+      const filename = `controlefinancas-backup-${new Date().toISOString().split('T')[0]}.json`;
       
       const result = await exportToFile(data, filename);
       
@@ -291,7 +291,7 @@ export default function SettingsPage() {
 
           {/* App Info */}
           <div className="text-center text-sm text-muted-foreground pt-4">
-            <p>FinançasPRO v2.0.1</p>
+            <p>Controle de Finanças v2.0.1</p>
             <p>Seus dados ficam salvos localmente no dispositivo</p>
           </div>
         </div>

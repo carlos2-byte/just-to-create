@@ -20,8 +20,8 @@ export default defineConfig(({ mode }) => ({
       registerType: "autoUpdate",
       includeAssets: ["icon.svg", "apple-touch-icon.png"],
       manifest: {
-        name: "FinançasPRO - Controle Financeiro",
-        short_name: "FinançasPRO",
+        name: "Controle de Finanças",
+        short_name: "controlefinancas",
         description: "Aplicativo de finanças pessoais 100% offline",
         theme_color: "#0f172a",
         background_color: "#0f172a",

@@ -179,7 +179,7 @@ export function LockScreen({ onUnlock }: LockScreenProps) {
       <Card className="w-full max-w-sm">
         <CardHeader className="text-center">
           <Lock className="h-12 w-12 mx-auto mb-2 text-primary" />
-          <CardTitle>FinançasPRO</CardTitle>
+          <CardTitle>Controle de Finanças</CardTitle>
           <CardDescription>Digite sua senha para acessar</CardDescription>
         </CardHeader>
         <CardContent>
