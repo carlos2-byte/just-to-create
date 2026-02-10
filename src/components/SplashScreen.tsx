@@ -9,7 +9,7 @@ export function SplashScreen({ onComplete }: SplashScreenProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
-    const timeout = setTimeout(stableOnComplete, 2300);
+    const timeout = setTimeout(stableOnComplete, 4300);
     return () => clearTimeout(timeout);
   }, [stableOnComplete]);
 
