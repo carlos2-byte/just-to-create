@@ -19,7 +19,7 @@ import {
   listTransactionObjects,
   updateCreditCard,
 } from './storage';
-import { generateAutoCardPayments } from './autoCardPayment';
+import { generateAutoCardPayments } from './autoCardPay';
 
 const ORIGINAL_LIMITS_KEY = 'original_card_limits';
 

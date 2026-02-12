@@ -9,11 +9,11 @@ import { useCardDetails, useCreditCards } from '@/hooks/useCreditCards';
 import { useTransactions } from '@/hooks/useTransactions';
 import { formatCurrency, getCurrentMonth, formatMonthYear } from '@/lib/formatters';
 import { getInvoiceDueDate, formatDateBR } from '@/lib/dateUtils';
-import { TransactionList } from '@/components/transactions/TransactionList';
+import { TransactionList } from '@/components/transactions/TxList';
 import { MonthSelector } from '@/components/transactions/MonthSelector';
-import { DeleteTransactionDialog } from '@/components/transactions/DeleteTransactionDialog';
-import { EditTransactionDialog } from '@/components/transactions/EditTransactionDialog';
-import { AddTransactionSheet } from '@/components/transactions/AddTransactionSheet';
+import { DeleteTransactionDialog } from '@/components/transactions/DeleteTxDialog';
+import { EditTransactionDialog } from '@/components/transactions/EditTxDialog';
+import { AddTransactionSheet } from '@/components/transactions/AddTxSheet';
 import { EditCardSheet } from '@/components/cards/EditCardSheet';
 import { CreditCard, Transaction } from '@/lib/storage';
 import {

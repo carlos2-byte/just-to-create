@@ -18,7 +18,7 @@ import {
 import { generateId, getCurrentMonth } from '@/lib/formatters';
 import { addMonthsToDate, addWeeksToDate, addYearsToDate, getLocalDateString } from '@/lib/dateUtils';
 import { calculateInvoiceMonth } from '@/lib/invoiceUtils';
-import { generateAutoCardPayments } from '@/lib/autoCardPayment';
+import { generateAutoCardPayments } from '@/lib/autoCardPay';
 import { processIncomeTransfer, initializeMonthEndCheck } from '@/lib/balanceTransfer';
 import { syncAfterTransactionChange, storeOriginalCardLimit } from '@/lib/dataIntegrity';
 

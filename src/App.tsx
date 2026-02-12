@@ -9,13 +9,13 @@ import { LockScreen } from "@/components/security/LockScreen";
 import { SplashScreen } from "@/components/SplashScreen";
 
 import { useAppLock } from "@/hooks/useAppLock";
-import { generateAutoCardPayments } from "@/lib/autoCardPayment";
+import { generateAutoCardPayments } from "@/lib/autoCardPay";
 import HomePage from "./pages/HomePage";
 import DashboardPage from "./pages/DashboardPage";
 import CardsPage from "./pages/CardsPage";
-import CardStatementPage from "./pages/CardStatementPage";
+import CardStatementPage from "./pages/CardStmtPage";
 import SettingsPage from "./pages/SettingsPage";
-import InvestmentsPage from "./pages/InvestmentsPage";
+import InvestmentsPage from "./pages/InvestPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
