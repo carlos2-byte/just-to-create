@@ -11,7 +11,7 @@ import {
   Transaction,
 } from '@/lib/storage';
 import { generateId, getCurrentMonth } from '@/lib/formatters';
-import { generateAutoCardPayments } from '@/lib/autoCardPayment';
+import { generateAutoCardPayments } from '@/lib/autoCardPay';
 import { 
   storeOriginalCardLimit, 
   removeOriginalCardLimit,

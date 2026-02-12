@@ -1,5 +1,5 @@
 import { defaultAdapter, StorageAdapter } from './storageAdapter';
-import { migrateSchemaOnce } from './migrations/migrateSchemaOnce';
+import { migrateSchemaOnce } from './migrations/migrateSchema';
 import { getMonthFromDate, getInvoiceMonth, getLocalDateString } from './dateUtils';
 
 export type Maybe<T> = T | undefined;

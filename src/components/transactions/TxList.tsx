@@ -1,5 +1,5 @@
 import { Transaction } from '@/lib/storage';
-import { TransactionItem } from './TransactionItem';
+import { TransactionItem } from './TxItem';
 import { Skeleton } from '@/components/ui/skeleton';
 
 interface TransactionListProps {

@@ -1,7 +1,7 @@
 import { Transaction } from '@/lib/storage';
 import { ConsolidatedInvoice } from '@/lib/invoiceUtils';
 import { StatementItem, isConsolidatedInvoice } from '@/hooks/useStatement';
-import { TransactionItem } from './TransactionItem';
+import { TransactionItem } from './TxItem';
 import { InvoiceItem } from './InvoiceItem';
 import { Skeleton } from '@/components/ui/skeleton';
 import { usePaymentStatus } from '@/hooks/usePaymentStatus';

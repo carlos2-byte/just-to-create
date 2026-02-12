@@ -6,7 +6,7 @@ import {
   getStatementTotals 
 } from '@/lib/invoiceUtils';
 import { getCurrentMonth } from '@/lib/formatters';
-import { calculateRealTimeBalances } from '@/lib/projectedBalance';
+import { calculateRealTimeBalances } from '@/lib/projBalance';
 import { getLocalMonth, getLocalDateString } from '@/lib/dateUtils';
 
 export type StatementItem = Transaction | ConsolidatedInvoice;

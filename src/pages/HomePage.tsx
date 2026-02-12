@@ -5,13 +5,13 @@ import { PageContainer } from '@/components/layout/PageContainer';
 import { BalanceCard } from '@/components/home/BalanceCard';
 import { CoverageAlert } from '@/components/home/CoverageAlert';
 import { TransferAlert } from '@/components/home/TransferAlert';
-import { PendingTransactionsAlert } from '@/components/home/PendingTransactionsAlert';
+import { PendingTransactionsAlert } from '@/components/home/PendingTxAlert';
 import { MonthSelector } from '@/components/transactions/MonthSelector';
 import { StatementList } from '@/components/transactions/StatementList';
 import { StatementFilter, FilterOptions } from '@/components/transactions/StatementFilter';
-import { AddTransactionSheet } from '@/components/transactions/AddTransactionSheet';
-import { DeleteTransactionDialog } from '@/components/transactions/DeleteTransactionDialog';
-import { EditTransactionDialog } from '@/components/transactions/EditTransactionDialog';
+import { AddTransactionSheet } from '@/components/transactions/AddTxSheet';
+import { DeleteTransactionDialog } from '@/components/transactions/DeleteTxDialog';
+import { EditTransactionDialog } from '@/components/transactions/EditTxDialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -25,7 +25,7 @@ import { getCurrentMonth } from '@/lib/formatters';
 import { Transaction } from '@/lib/storage';
 import { ConsolidatedInvoice } from '@/lib/invoiceUtils';
 import { checkAndRecordMonthEndBalance } from '@/lib/balanceTransfer';
-import { applyTodaysCoverageIfNeeded } from '@/lib/investmentCoverage';
+import { applyTodaysCoverageIfNeeded } from '@/lib/investCoverage';
 
 export default function HomePage() {
   const navigate = useNavigate();

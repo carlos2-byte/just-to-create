@@ -7,7 +7,7 @@ import { formatCurrency, getCurrentMonth } from '@/lib/formatters';
 import { getCategories } from '@/lib/storage';
 import { TrendingUp, TrendingDown, PiggyBank, Shield } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { calculateFutureCoverableExpenses } from '@/lib/investmentCoverage';
+import { calculateFutureCoverableExpenses } from '@/lib/investCoverage';
 
 export default function DashboardPage() {
   const [month, setMonth] = useState(getCurrentMonth());

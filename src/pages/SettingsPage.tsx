@@ -28,8 +28,8 @@ import { exportAllData, importAllData, clearAllData } from '@/lib/storage';
 import { isPasswordEnabled, removePassword } from '@/lib/security';
 import { exportToFile, isNativePlatform } from '@/lib/fileExport';
 import { toast } from '@/hooks/use-toast';
-import { PasswordSetupSheet } from '@/components/security/PasswordSetupSheet';
-import { ExportBackupDialog } from '@/components/settings/ExportBackupDialog';
+import { PasswordSetupSheet } from '@/components/security/PwdSetupSheet';
+import { ExportBackupDialog } from '@/components/settings/ExportDialog';
 import {
   AlertDialog,
   AlertDialogAction,
