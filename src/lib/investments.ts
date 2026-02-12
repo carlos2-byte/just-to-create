@@ -20,7 +20,9 @@ export interface Investment {
   name: string;
   type?: string; // Custom type defined by user
   initialAmount: number;
-  currentAmount: number;
+  currentAmount: number; // = totalDeposited + accumulatedYield
+  totalDeposited: number; // Sum of initialAmount + all deposits
+  accumulatedYield: number; // Sum of all net yields
   yieldRate: number; // Annual rate in percentage (e.g., 6.5)
   cdiBonusPercent?: number; // CDI bonus percentage (e.g., 115 means 115% of CDI)
   startDate: string; // YYYY-MM-DD
@@ -68,7 +70,16 @@ export async function setDefaultYieldRate(rate: number): Promise<void> {
  */
 export async function getInvestments(): Promise<Investment[]> {
   const investments = await defaultAdapter.getItem<Record<string, Investment>>(INVESTMENTS_KEY, {});
-  return Object.values(investments ?? {}).sort((a, b) => 
+  // Migrate legacy investments that don't have totalDeposited/accumulatedYield
+  const migrated = Object.values(investments ?? {}).map(inv => {
+    if (inv.totalDeposited === undefined || inv.totalDeposited === null) {
+      inv.totalDeposited = inv.initialAmount;
+      inv.accumulatedYield = inv.currentAmount - inv.initialAmount;
+      if (inv.accumulatedYield < 0) inv.accumulatedYield = 0;
+    }
+    return inv;
+  });
+  return migrated.sort((a, b) => 
     new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
   );
 }
@@ -101,6 +112,8 @@ export async function createInvestment(
     type: type?.trim(),
     initialAmount: amount,
     currentAmount: amount,
+    totalDeposited: amount,
+    accumulatedYield: 0,
     yieldRate: yieldRate ?? defaultRate,
     cdiBonusPercent,
     startDate: startDate ?? getLocalDateString(),
@@ -186,10 +199,23 @@ export async function useInvestmentForCoverage(
   
   if (amountToUse <= 0) return null;
   
-  // Deduct from investment
-  investment.currentAmount -= amountToUse;
+  // Deduct from investment - withdraw from yield first, then deposited
+  if (investment.totalDeposited === undefined) investment.totalDeposited = investment.initialAmount;
+  if (investment.accumulatedYield === undefined) investment.accumulatedYield = investment.currentAmount - investment.initialAmount;
+  
+  if (amountToUse <= investment.accumulatedYield) {
+    investment.accumulatedYield -= amountToUse;
+  } else {
+    const remainder = amountToUse - investment.accumulatedYield;
+    investment.accumulatedYield = 0;
+    investment.totalDeposited -= remainder;
+  }
+  investment.currentAmount = investment.totalDeposited + investment.accumulatedYield;
+  
   if (investment.currentAmount <= 0) {
     investment.currentAmount = 0;
+    investment.totalDeposited = 0;
+    investment.accumulatedYield = 0;
     investment.isActive = false;
   }
   
@@ -223,7 +249,15 @@ export async function addToInvestment(id: string, amount: number): Promise<void>
   const investment = await getInvestmentById(id);
   if (!investment) return;
   
-  investment.currentAmount += amount;
+  // Migrate legacy if needed
+  if (investment.totalDeposited === undefined || investment.totalDeposited === null) {
+    investment.totalDeposited = investment.initialAmount;
+    investment.accumulatedYield = investment.currentAmount - investment.initialAmount;
+    if (investment.accumulatedYield < 0) investment.accumulatedYield = 0;
+  }
+  
+  investment.totalDeposited += amount;
+  investment.currentAmount = investment.totalDeposited + investment.accumulatedYield;
   await updateInvestment(investment);
 }
 
@@ -303,15 +337,9 @@ export async function processDailyYields(): Promise<number> {
     // Only process up to yesterday (yield applies next day)
     if (processStartDate > yesterday) continue;
     
-    // Determine starting balance
-    // If we have history, use the last balance
-    // Otherwise use the initial amount
-    let currentAmount: number;
-    if (lastInvestmentYield) {
-      currentAmount = lastInvestmentYield.balanceAfter;
-    } else {
-      currentAmount = investment.initialAmount;
-    }
+    // Use the actual current amount from the investment (includes deposits)
+    // This ensures deposits are never lost when yields are recalculated
+    let currentAmount: number = investment.currentAmount;
     
     // Get the applicable yield rate for each day
     // (considering rate change history)
@@ -382,8 +410,12 @@ export async function processDailyYields(): Promise<number> {
       currentDate = addDaysToDate(currentDate, 1);
     }
     
-    // Update investment with new balance
-    investment.currentAmount = currentAmount;
+    // Update investment with new balance - accumulate yield properly
+    const yieldAdded = currentAmount - investment.currentAmount;
+    if (investment.accumulatedYield === undefined) investment.accumulatedYield = 0;
+    if (investment.totalDeposited === undefined) investment.totalDeposited = investment.initialAmount;
+    investment.accumulatedYield += yieldAdded;
+    investment.currentAmount = investment.totalDeposited + investment.accumulatedYield;
     investment.lastYieldDate = yesterday;
     await updateInvestment(investment);
   }
@@ -445,12 +477,28 @@ export async function withdrawFromInvestment(
   const investment = await getInvestmentById(id);
   if (!investment || amount > investment.currentAmount) return null;
   
+  // Migrate legacy if needed
+  if (investment.totalDeposited === undefined) investment.totalDeposited = investment.initialAmount;
+  if (investment.accumulatedYield === undefined) investment.accumulatedYield = investment.currentAmount - investment.initialAmount;
+  
   const withdrawAmount = Math.min(amount, investment.currentAmount);
-  investment.currentAmount -= withdrawAmount;
+  
+  // Deduct from yield first, then from deposited
+  if (withdrawAmount <= investment.accumulatedYield) {
+    investment.accumulatedYield -= withdrawAmount;
+  } else {
+    const remainder = withdrawAmount - investment.accumulatedYield;
+    investment.accumulatedYield = 0;
+    investment.totalDeposited -= remainder;
+  }
+  
+  investment.currentAmount = investment.totalDeposited + investment.accumulatedYield;
   
   // If fully withdrawn, mark as inactive
   if (investment.currentAmount <= 0) {
     investment.currentAmount = 0;
+    investment.totalDeposited = 0;
+    investment.accumulatedYield = 0;
     investment.isActive = false;
   }
   
