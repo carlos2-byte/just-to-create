@@ -2,17 +2,20 @@ import { useState, useMemo, useEffect } from 'react';
 import { PageContainer } from '@/components/layout/PageContainer';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { MonthSelector } from '@/components/transactions/MonthSelector';
+import { Button } from '@/components/ui/button';
 import { useStatement, isConsolidatedInvoice } from '@/hooks/useStatement';
 import { formatCurrency, getCurrentMonth } from '@/lib/formatters';
 import { getCategories } from '@/lib/storage';
-import { TrendingUp, TrendingDown, PiggyBank, Shield } from 'lucide-react';
+import { TrendingUp, TrendingDown, PiggyBank, Shield, Share2 } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { calculateFutureCoverableExpenses } from '@/lib/investCoverage';
+import { ShareSummarySheet } from '@/components/dashboard/ShareSummarySheet';
 
 export default function DashboardPage() {
   const [month, setMonth] = useState(getCurrentMonth());
   const { items, totals, balanceData, loading } = useStatement(month);
   const [futureCoverage, setFutureCoverage] = useState<{ total: number; items: Array<{ date: string; description: string; amount: number }> }>({ total: 0, items: [] });
+  const [showShare, setShowShare] = useState(false);
 
   // Calculate future expenses that will be covered by investment
   useEffect(() => {
@@ -66,7 +69,15 @@ export default function DashboardPage() {
     <PageContainer
       header={
         <div className="space-y-4">
-          <h1 className="text-2xl font-bold text-center">Relatório</h1>
+          <div className="flex items-center justify-between">
+            <div className="flex-1" />
+            <h1 className="text-2xl font-bold text-center">Relatório</h1>
+            <div className="flex-1 flex justify-end">
+              <Button variant="ghost" size="icon" onClick={() => setShowShare(true)}>
+                <Share2 className="h-5 w-5" />
+              </Button>
+            </div>
+          </div>
           <MonthSelector month={month} onMonthChange={setMonth} />
         </div>
       }
@@ -226,6 +237,17 @@ export default function DashboardPage() {
           </Card>
         </div>
       </ScrollArea>
+
+      <ShareSummarySheet
+        open={showShare}
+        onOpenChange={setShowShare}
+        month={month}
+        income={totals.income}
+        expense={totals.expense}
+        currentBalance={currentBalance}
+        futureCoverage={futureCoverage.total}
+        categoryData={categoryData}
+      />
     </PageContainer>
   );
 }
