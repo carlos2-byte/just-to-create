@@ -33,7 +33,7 @@ import { useInvestments, useInvestmentDetails } from '@/hooks/useInvestments';
 import { useTransactions } from '@/hooks/useTransactions';
 import { formatCurrency, getCurrentMonth } from '@/lib/formatters';
 import { formatDateBR } from '@/lib/dateUtils';
-import { Investment, getDailyYieldEstimate, getMonthlyYieldEstimate } from '@/lib/investments';
+import { Investment, getMonthlyYieldEstimate, getInvestmentTaxInfo } from '@/lib/investments';
 import { toast } from '@/hooks/use-toast';
 
 export default function InvestmentsPage() {
@@ -131,7 +131,7 @@ export default function InvestmentsPage() {
     try {
       const result = await withdraw(selectedInvestment.id, amount);
       if (result?.success) {
-        // Create income transaction
+        // Create income transaction with net amount (after IR)
         await addTransaction({
           amount: result.amount,
           description: `Resgate: ${result.investmentName}`,
@@ -139,7 +139,13 @@ export default function InvestmentsPage() {
           date: new Date().toISOString().split('T')[0],
           category: 'income',
         });
-        toast({ title: 'Resgate realizado!' });
+        const taxMsg = result.taxAmount && result.taxAmount > 0
+          ? ` (IR: ${formatCurrency(result.taxAmount)})`
+          : '';
+        toast({
+          title: 'Resgate realizado!',
+          description: `Líquido: ${formatCurrency(result.amount)}${taxMsg}`
+        });
       }
       setActionAmount('');
       setShowWithdrawSheet(false);
@@ -205,13 +211,17 @@ export default function InvestmentsPage() {
   };
 
   // Calculate totals for display
-  const totalDailyYield = investments
-    .filter(i => i.isActive)
-    .reduce((sum, inv) => sum + getDailyYieldEstimate(inv.currentAmount, inv.yieldRate, inv.cdiBonusPercent).net, 0);
-
   const totalMonthlyYield = investments
     .filter(i => i.isActive)
-    .reduce((sum, inv) => sum + getMonthlyYieldEstimate(inv.currentAmount, inv.yieldRate, inv.cdiBonusPercent).net, 0);
+    .reduce((sum, inv) => sum + getMonthlyYieldEstimate(inv.currentAmount, inv.yieldRate, inv.cdiBonusPercent).gross, 0);
+
+  const totalMonthlyTax = investments
+    .filter(i => i.isActive)
+    .reduce((sum, inv) => {
+      const monthlyGross = getMonthlyYieldEstimate(inv.currentAmount, inv.yieldRate, inv.cdiBonusPercent).gross;
+      const { weightedRate } = getInvestmentTaxInfo(inv);
+      return sum + monthlyGross * weightedRate;
+    }, 0);
 
   return (
     <PageContainer
@@ -245,20 +255,20 @@ export default function InvestmentsPage() {
             </div>
             <div className="mt-4 grid grid-cols-2 gap-4 pt-4 border-t border-primary/20">
               <div>
-                <p className="text-xs text-muted-foreground">Rendimento Diário</p>
-                <p className="font-semibold text-success tabular-nums">
-                  +{formatCurrency(totalDailyYield)}
-                </p>
-              </div>
-              <div>
                 <p className="text-xs text-muted-foreground">Rendimento Mensal (est.)</p>
                 <p className="font-semibold text-success tabular-nums">
                   +{formatCurrency(totalMonthlyYield)}
                 </p>
               </div>
+              <div>
+                <p className="text-xs text-muted-foreground">IR estimado (mensal)</p>
+                <p className="text-[11px] font-medium text-muted-foreground tabular-nums">
+                  -{formatCurrency(totalMonthlyTax)}
+                </p>
+              </div>
             </div>
-            <p className="text-xs text-muted-foreground mt-2">
-              Taxa padrão: {defaultRate}% a.a. • Imposto: 20% sobre rendimentos
+            <p className="text-[11px] text-muted-foreground mt-2">
+              Taxa padrão: {defaultRate}% a.a. • IR: tabela regressiva (15% a 22,5%)
             </p>
           </CardContent>
         </Card>
@@ -288,9 +298,9 @@ export default function InvestmentsPage() {
           ) : (
             <div className="space-y-3">
               {investments.map(inv => {
-                const dailyYield = getDailyYieldEstimate(inv.currentAmount, inv.yieldRate, inv.cdiBonusPercent);
                 const monthlyYield = getMonthlyYieldEstimate(inv.currentAmount, inv.yieldRate, inv.cdiBonusPercent);
                 const totalYield = inv.accumulatedYield ?? 0;
+                const taxInfo = getInvestmentTaxInfo(inv);
                 
                 return (
                   <Card key={inv.id}>
@@ -353,29 +363,28 @@ export default function InvestmentsPage() {
                       {/* Yield Estimates */}
                       <div className="grid grid-cols-2 gap-2 mb-3 p-2 bg-muted/30 rounded-lg">
                         <div>
+                          <p className="text-xs text-muted-foreground">Rend. mensal (est.)</p>
+                          <p className="text-sm font-medium text-success tabular-nums">
+                            +{formatCurrency(monthlyYield.gross)}
+                          </p>
+                        </div>
+                        <div>
                           <div className="flex items-center gap-1">
-                            <p className="text-xs text-muted-foreground">Rend. diário</p>
+                            <p className="text-xs text-muted-foreground">IR estimado</p>
                             <TooltipProvider>
                               <Tooltip>
                                 <TooltipTrigger>
                                   <Info className="h-3 w-3 text-muted-foreground" />
                                 </TooltipTrigger>
                                 <TooltipContent>
-                                  <p>Bruto: {formatCurrency(dailyYield.gross)}</p>
-                                  <p>Imposto (20%): -{formatCurrency(dailyYield.gross - dailyYield.net)}</p>
-                                  <p className="font-bold">Líquido: {formatCurrency(dailyYield.net)}</p>
+                                  <p>Alíquota: {taxInfo.rateLabel}</p>
+                                  <p>Cobrado apenas no resgate</p>
                                 </TooltipContent>
                               </Tooltip>
                             </TooltipProvider>
                           </div>
-                          <p className="text-sm font-medium text-success tabular-nums">
-                            +{formatCurrency(dailyYield.net)}
-                          </p>
-                        </div>
-                        <div>
-                          <p className="text-xs text-muted-foreground">Rend. mensal (est.)</p>
-                          <p className="text-sm font-medium text-success tabular-nums">
-                            +{formatCurrency(monthlyYield.net)}
+                          <p className="text-[11px] text-muted-foreground tabular-nums">
+                            -{formatCurrency(monthlyYield.gross * taxInfo.weightedRate)} ({taxInfo.rateLabel})
                           </p>
                         </div>
                       </div>
@@ -519,7 +528,7 @@ export default function InvestmentsPage() {
             )}
             <p className="text-xs text-muted-foreground">
               Rendimento calculado com base em 252 dias úteis/ano.
-              20% de imposto é deduzido automaticamente.
+              IR pela tabela regressiva, cobrado apenas no resgate.
             </p>
             <Button type="submit" className="w-full" disabled={isSubmitting}>
               {isSubmitting ? 'Criando...' : 'Criar Investimento'}
@@ -668,7 +677,8 @@ export default function InvestmentsPage() {
                 />
               </div>
               <p className="text-xs text-muted-foreground">
-                O valor resgatado será adicionado como receita
+                IR descontado automaticamente (tabela regressiva: 22,5% a 15%).
+                O valor líquido será adicionado como receita.
               </p>
             </div>
             <Button type="submit" className="w-full" disabled={isSubmitting}>

@@ -8,7 +8,7 @@
  */
 
 import { getTransactionsByMonth, Transaction } from './storage';
-import { getInvestmentsForCoverage, calculateDailyYield, calculateNetYield } from './investments';
+import { getInvestmentsForCoverage, calculateDailyYield } from './investments';
 import { getLocalDateString, parseLocalDate, getLocalMonth, addDaysToDate } from './dateUtils';
 import { ConsolidatedInvoice } from './invoiceUtils';
 
@@ -78,8 +78,7 @@ export async function calculateRealTimeBalances(
     if (coverageInvestments.length > 0) {
       const inv = coverageInvestments[0];
       const grossYield = calculateDailyYield(currentBalance, inv.yieldRate, inv.cdiBonusPercent);
-      const { net } = calculateNetYield(grossYield);
-      dailyYield = net;
+      dailyYield = grossYield;
     }
   }
   
@@ -140,8 +139,7 @@ export async function calculateProjectedBalance(
     if (coverageInvestments.length > 0) {
       const inv = coverageInvestments[0];
       const grossYield = calculateDailyYield(currentBalance, inv.yieldRate, inv.cdiBonusPercent);
-      const { net } = calculateNetYield(grossYield);
-      dailyYield = net;
+      dailyYield = grossYield;
     }
   }
   
@@ -226,8 +224,7 @@ export async function calculateAccumulatedYield(month: string): Promise<number> 
     
     if (balance > 0) {
       const grossYield = calculateDailyYield(balance, inv.yieldRate, inv.cdiBonusPercent);
-      const { net } = calculateNetYield(grossYield);
-      totalYield += net;
+      totalYield += grossYield;
     }
     
     currentDate = addDaysToDate(currentDate, 1);
