@@ -386,11 +386,7 @@ export default function InvestmentsPage() {
                           <p className="text-xl font-bold tabular-nums">
                             {formatCurrency(inv.currentAmount)}
                           </p>
-                          {totalYield > 0 && (
-                            <p className="text-xs text-success">
-                              +{formatCurrency(totalYield)} {isDailyTax ? 'rendimento líquido' : 'rendimento acumulado'}
-                            </p>
-                          )}
+                          {/* totalYield kept for internal use but hidden from UI */}
                         </div>
                       </div>
 

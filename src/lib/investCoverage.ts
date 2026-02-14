@@ -173,10 +173,11 @@ export async function applyTodaysCoverageIfNeeded(
     return null;
   }
   
-  // Create income transaction for the coverage
-  const description = dueItems.length > 0
-    ? `Cobertura: ${dueItems.map(d => d.description).slice(0, 2).join(', ')}${dueItems.length > 2 ? '...' : ''}`
-    : `Cobertura automática: ${result.investmentName}`;
+  // Create income transaction for the coverage - abbreviated with investment name
+  const invNameShort = result.investmentName.length > 15
+    ? result.investmentName.substring(0, 15).trim() + '…'
+    : result.investmentName;
+  const description = `Cobertura: ${invNameShort}`;
   
   const transaction: Transaction = {
     id: generateId(),
