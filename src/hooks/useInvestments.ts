@@ -55,9 +55,10 @@ export function useInvestments() {
     yieldRate?: number,
     startDate?: string,
     type?: string,
-    cdiBonusPercent?: number
+    cdiBonusPercent?: number,
+    taxMode?: 'daily' | 'on_withdrawal'
   ) => {
-    const investment = await createInvestment(name, amount, yieldRate, startDate, type, cdiBonusPercent);
+    const investment = await createInvestment(name, amount, yieldRate, startDate, type, cdiBonusPercent, taxMode);
     await loadInvestments();
     return investment;
   }, [loadInvestments]);
