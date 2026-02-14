@@ -62,6 +62,7 @@ export interface Investment {
   isActive: boolean;
   createdAt: string;
   canCoverNegativeBalance?: boolean;
+  taxMode?: 'daily' | 'on_withdrawal'; // UI-only: how tax is displayed/described
   yieldRateHistory?: YieldRateChange[];
   deposits?: DepositRecord[];
 }
@@ -146,7 +147,8 @@ export async function createInvestment(
   yieldRate?: number,
   startDate?: string,
   type?: string,
-  cdiBonusPercent?: number
+  cdiBonusPercent?: number,
+  taxMode?: 'daily' | 'on_withdrawal'
 ): Promise<Investment> {
   const investments = await defaultAdapter.getItem<Record<string, Investment>>(INVESTMENTS_KEY, {}) ?? {};
   const defaultRate = await getDefaultYieldRate();
@@ -162,6 +164,7 @@ export async function createInvestment(
     accumulatedYield: 0,
     yieldRate: yieldRate ?? defaultRate,
     cdiBonusPercent,
+    taxMode: taxMode ?? 'on_withdrawal',
     startDate: start,
     isActive: true,
     createdAt: new Date().toISOString(),

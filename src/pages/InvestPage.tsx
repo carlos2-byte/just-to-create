@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Plus, TrendingUp, Trash2, ArrowDownToLine, ArrowUpFromLine, Percent, Info, Shield, Edit2 } from 'lucide-react';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { PageContainer } from '@/components/layout/PageContainer';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -72,6 +73,8 @@ export default function InvestmentsPage() {
   const [editHasCdiBonus, setEditHasCdiBonus] = useState(false);
   const [editCdiBonusPercent, setEditCdiBonusPercent] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [newTaxMode, setNewTaxMode] = useState<'daily' | 'on_withdrawal'>('on_withdrawal');
+  const [editTaxMode, setEditTaxMode] = useState<'daily' | 'on_withdrawal'>('on_withdrawal');
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -82,7 +85,7 @@ export default function InvestmentsPage() {
     try {
       const rate = newRate ? parseFloat(newRate.replace(',', '.')) : undefined;
       const bonus = hasCdiBonus && cdiBonusPercent ? parseFloat(cdiBonusPercent.replace(',', '.')) : undefined;
-      await create(newName.trim(), amount, rate, undefined, newType.trim() || undefined, bonus);
+      await create(newName.trim(), amount, rate, undefined, newType.trim() || undefined, bonus, newTaxMode);
       toast({ title: 'Investimento criado!' });
       setNewName('');
       setNewType('');
@@ -90,6 +93,7 @@ export default function InvestmentsPage() {
       setNewRate('');
       setHasCdiBonus(false);
       setCdiBonusPercent('');
+      setNewTaxMode('on_withdrawal');
       setShowAddSheet(false);
     } finally {
       setIsSubmitting(false);
