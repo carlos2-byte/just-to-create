@@ -214,21 +214,34 @@ export default function InvestmentsPage() {
     setInvestmentToDelete(null);
   };
 
+  const getDaysSinceStart = (inv: Investment) => {
+    const start = new Date(inv.startDate + 'T00:00:00');
+    const now = new Date();
+    now.setHours(0, 0, 0, 0);
+    return Math.floor((now.getTime() - start.getTime()) / 86400000);
+  };
+
   // Calculate totals for display
   const totalDailyYield = investments
     .filter(i => i.isActive)
-    .reduce((sum, inv) => sum + getDailyYieldEstimate(inv.currentAmount, inv.yieldRate, inv.cdiBonusPercent).gross, 0);
+    .reduce((sum, inv) => {
+      const days = getDaysSinceStart(inv);
+      return sum + getDailyYieldEstimate(inv.currentAmount, inv.yieldRate, inv.cdiBonusPercent, days, inv.taxMode).net;
+    }, 0);
 
   const totalMonthlyYield = investments
     .filter(i => i.isActive)
-    .reduce((sum, inv) => sum + getMonthlyYieldEstimate(inv.currentAmount, inv.yieldRate, inv.cdiBonusPercent).gross, 0);
+    .reduce((sum, inv) => {
+      const days = getDaysSinceStart(inv);
+      return sum + getMonthlyYieldEstimate(inv.currentAmount, inv.yieldRate, inv.cdiBonusPercent, days, inv.taxMode).net;
+    }, 0);
 
   const totalMonthlyTax = investments
     .filter(i => i.isActive)
     .reduce((sum, inv) => {
-      const monthlyGross = getMonthlyYieldEstimate(inv.currentAmount, inv.yieldRate, inv.cdiBonusPercent).gross;
-      const { weightedRate } = getInvestmentTaxInfo(inv);
-      return sum + monthlyGross * weightedRate;
+      const days = getDaysSinceStart(inv);
+      const est = getMonthlyYieldEstimate(inv.currentAmount, inv.yieldRate, inv.cdiBonusPercent, days, inv.taxMode);
+      return sum + (est.gross - est.net);
     }, 0);
 
   return (
@@ -312,9 +325,13 @@ export default function InvestmentsPage() {
           ) : (
             <div className="space-y-3">
               {investments.map(inv => {
-                const monthlyYield = getMonthlyYieldEstimate(inv.currentAmount, inv.yieldRate, inv.cdiBonusPercent);
+                const days = getDaysSinceStart(inv);
+                const dailyYield = getDailyYieldEstimate(inv.currentAmount, inv.yieldRate, inv.cdiBonusPercent, days, inv.taxMode);
+                const monthlyYield = getMonthlyYieldEstimate(inv.currentAmount, inv.yieldRate, inv.cdiBonusPercent, days, inv.taxMode);
                 const totalYield = inv.accumulatedYield ?? 0;
                 const taxInfo = getInvestmentTaxInfo(inv);
+                const isDailyTax = inv.taxMode === 'daily';
+                const monthlyTax = monthlyYield.gross - monthlyYield.net;
                 
                 return (
                   <Card key={inv.id}>
@@ -371,7 +388,7 @@ export default function InvestmentsPage() {
                           </p>
                           {totalYield > 0 && (
                             <p className="text-xs text-success">
-                              +{formatCurrency(totalYield)} rendimento líquido
+                              +{formatCurrency(totalYield)} {isDailyTax ? 'rendimento líquido' : 'rendimento acumulado'}
                             </p>
                           )}
                         </div>
@@ -380,20 +397,26 @@ export default function InvestmentsPage() {
                       {/* Yield Estimates */}
                       <div className="grid grid-cols-3 gap-2 mb-3 p-2 bg-muted/30 rounded-lg">
                         <div>
-                          <p className="text-[10px] text-muted-foreground">Rend. Dia</p>
+                          <p className="text-[10px] text-muted-foreground">
+                            {isDailyTax ? 'Rend. Líq./Dia' : 'Rend. Dia'}
+                          </p>
                           <p className="text-xs font-medium text-success tabular-nums">
-                            +{formatCurrency(getDailyYieldEstimate(inv.currentAmount, inv.yieldRate, inv.cdiBonusPercent).gross)}
+                            +{formatCurrency(dailyYield.net)}
                           </p>
                         </div>
                         <div>
-                          <p className="text-[10px] text-muted-foreground">Rend. Mês</p>
+                          <p className="text-[10px] text-muted-foreground">
+                            {isDailyTax ? 'Rend. Líq./Mês' : 'Rend. Mês'}
+                          </p>
                           <p className="text-xs font-medium text-success tabular-nums">
-                            +{formatCurrency(monthlyYield.gross)}
+                            +{formatCurrency(monthlyYield.net)}
                           </p>
                         </div>
                         <div>
                           <div className="flex items-center gap-1">
-                            <p className="text-[10px] text-muted-foreground">IR est.</p>
+                            <p className="text-[10px] text-muted-foreground">
+                              {isDailyTax ? 'IR descontado' : 'IR est. (saque)'}
+                            </p>
                             <TooltipProvider>
                               <Tooltip>
                                 <TooltipTrigger>
@@ -401,13 +424,13 @@ export default function InvestmentsPage() {
                                 </TooltipTrigger>
                                 <TooltipContent>
                                   <p>Alíquota: {taxInfo.rateLabel}</p>
-                                  <p>Cobrado apenas no resgate</p>
+                                  <p>{isDailyTax ? 'IR já descontado do rendimento' : 'IR cobrado apenas no resgate'}</p>
                                 </TooltipContent>
                               </Tooltip>
                             </TooltipProvider>
                           </div>
                           <p className="text-[10px] text-muted-foreground tabular-nums">
-                            -{formatCurrency(monthlyYield.gross * taxInfo.weightedRate)} ({taxInfo.rateLabel})
+                            -{formatCurrency(isDailyTax ? monthlyTax : monthlyYield.gross * taxInfo.weightedRate)} ({taxInfo.rateLabel})
                           </p>
                         </div>
                       </div>
