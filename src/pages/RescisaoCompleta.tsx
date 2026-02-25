@@ -19,6 +19,7 @@ import {
 } from '@/lib/calculadora';
 import { calcularINSS, calcularIRRF, calcularSeguroDesemprego } from '@/lib/tabelas';
 import { gerarRelatorioPDF } from '@/lib/gerarPDF';
+import { showInterstitialAfterCalc, showInterstitialOnReport } from '@/lib/admobService';
 import { isModoRH } from '@/lib/userConfig';
 import { toast } from 'sonner';
 import { FileDown, Save, User } from 'lucide-react';
@@ -163,7 +164,7 @@ const RescisaoCompleta = () => {
 
     const res = calcularRescisao(dados);
     setResultado(res);
-    // Histórico agora é salvo manualmente pelo botão "Salvar no Histórico"
+    showInterstitialAfterCalc();
 
     const baseINSS = res.saldoSalario + res.avisoPrevio + res.decimoTerceiro;
     const inss = calcularINSS(baseINSS);
@@ -209,6 +210,7 @@ const RescisaoCompleta = () => {
         seguroDesemprego: dadosCalculo.seguroDesemprego,
       });
       toast.success(`✅ PDF salvo: ${nomeArquivo}`, { description: 'Verifique a pasta Downloads' });
+      showInterstitialOnReport();
     } catch (error) {
       console.error('Erro ao gerar PDF:', error);
       toast.error('Erro ao gerar PDF');

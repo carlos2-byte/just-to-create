@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">calculadora_de_rescisao_clt_brasil</string>
-    <string name="title_activity_main">calculadora_de_rescisao_clt_brasil</string>
+    <string name="app_name">Cálculo de Rescisão Trabalhista</string>
+    <string name="title_activity_main">Cálculo de Rescisão Trabalhista</string>
     <string name="package_name">com.carlos.calculadora_de_rescisao_clt_brasil</string>
     <string name="custom_url_scheme">com.carlos.calculadora_de_rescisao_clt_brasil</string>
 </resources>

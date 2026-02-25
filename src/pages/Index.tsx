@@ -59,10 +59,10 @@ const Index = () => {
         >
           <div className="flex items-center gap-2 mb-1">
             <DollarSign className="h-5 w-5 text-primary" />
-            <span className="text-sm font-medium text-primary">Calculadora CLT</span>
+            <span className="text-sm font-medium text-primary">Cálculo de Rescisão Trabalhista</span>
           </div>
           <h1 className="text-2xl font-bold text-navy-foreground mb-1">
-            Rescisão Trabalhista
+            Cálculo de Rescisão Trabalhista
           </h1>
           <p className="text-sm text-navy-foreground/70">
             Simule seus direitos com base na legislação vigente
@@ -148,7 +148,7 @@ const Index = () => {
       {/* Footer disclaimer */}
       <div className="px-6 pb-8">
         <p className="text-[10px] text-muted-foreground text-center leading-relaxed">
-          Simulação baseada na legislação trabalhista brasileira vigente. Valores estimativos. Consulte um advogado para orientação específica.
+          Cálculo baseado na legislação trabalhista brasileira vigente. Valores estimativos. Consulte um advogado para orientação específica.
         </p>
       </div>
     </div>

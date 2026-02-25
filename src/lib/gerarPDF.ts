@@ -55,7 +55,7 @@ function construirPDF(dadosPDF: DadosPDF): jsPDF {
   // Title
   doc.setFontSize(18);
   doc.setFont('helvetica', 'bold');
-  doc.text('Relatório de Rescisão Trabalhista', marginLeft, y);
+  doc.text('Cálculo de Rescisão Trabalhista', marginLeft, y);
   y += 10;
 
   doc.setFontSize(9);
