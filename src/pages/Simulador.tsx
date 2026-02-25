@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { formatarMoeda } from '@/lib/calculadora';
+import { showInterstitialAfterCalc } from '@/lib/admobService';
 import { isModoRH } from '@/lib/userConfig';
 import { toast } from 'sonner';
 import { User } from 'lucide-react';
@@ -128,6 +129,7 @@ const Simulador = () => {
     }
 
     setResultados(res);
+    showInterstitialAfterCalc();
     toast.success('Calculado!');
   };
 
