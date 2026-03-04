@@ -378,7 +378,7 @@ export function AddTransactionSheet({
                         type="button"
                         variant={paymentMethod === 'credit' ? 'default' : 'outline'}
                         className="flex flex-col h-auto py-3 gap-1"
-                        onClick={() => setPaymentMethod('credit')}
+                        onClick={() => { setPaymentMethod('credit'); setMandatoryAccountId(''); }}
                       >
                         <CardIcon className="h-5 w-5" />
                         <span className="text-xs">Crédito</span>
