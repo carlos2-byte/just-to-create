@@ -278,7 +278,7 @@ export default function InvestmentsPage() {
               <TrendingUp className="h-8 w-8 text-primary" />
               <div>
                 <p className="text-sm text-muted-foreground">Total Investido</p>
-                <p className="text-2xl font-bold text-primary tabular-nums">
+                <p className="text-2xl font-bold text-primary tabular-nums truncate">
                   {formatCurrency(totalInvested)}
                 </p>
               </div>
