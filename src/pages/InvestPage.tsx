@@ -274,11 +274,11 @@ export default function InvestmentsPage() {
         {/* Total Card */}
         <Card className="bg-primary/10 border-primary/20">
           <CardContent className="pt-6">
-            <div className="flex items-center gap-3">
-              <TrendingUp className="h-8 w-8 text-primary" />
-              <div>
+            <div className="flex items-center gap-3 min-w-0">
+              <TrendingUp className="h-8 w-8 text-primary shrink-0" />
+              <div className="min-w-0">
                 <p className="text-sm text-muted-foreground">Total Investido</p>
-                <p className="text-2xl font-bold text-primary tabular-nums">
+                <p className="text-2xl font-bold text-primary tabular-nums truncate">
                   {formatCurrency(totalInvested)}
                 </p>
               </div>
@@ -392,7 +392,7 @@ export default function InvestmentsPage() {
                       <div className="flex items-end justify-between mb-3">
                         <div>
                           <p className="text-sm text-muted-foreground">Saldo atual</p>
-                          <p className="text-xl font-bold tabular-nums">
+                          <p className="text-xl font-bold tabular-nums truncate">
                             {formatCurrency(inv.currentAmount)}
                           </p>
                           {/* totalYield kept for internal use but hidden from UI */}

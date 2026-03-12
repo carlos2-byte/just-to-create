@@ -49,7 +49,7 @@ function CardItem({
             <CardIcon className="h-8 w-8 text-white/80" />
             <div className="text-right">
               <p className="text-xs text-white/70">Fatura {formatMonthYear(getCurrentMonth())}</p>
-              <p className="text-lg font-bold text-white">
+              <p className="text-lg font-bold text-white truncate">
                 {formatCurrency(monthlyTotal)}
               </p>
             </div>
@@ -64,7 +64,7 @@ function CardItem({
               <div className="text-right text-xs text-white/70">
                 {card.closingDay && <p>Fecha dia {card.closingDay}</p>}
                 {card.limit && (
-                  <p>Limite: {formatCurrency(availableLimit)} disponível</p>
+                  <p className="truncate">Limite: {formatCurrency(availableLimit)} disponível</p>
                 )}
               </div>
             </div>

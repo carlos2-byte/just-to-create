@@ -140,7 +140,7 @@ export default function SalaryAccountsPage() {
             <Card className="bg-gradient-to-br from-primary/10 to-primary/5 border-primary/20">
               <CardContent className="py-4">
                 <p className="text-sm text-muted-foreground">Saldo Total</p>
-                <p className="text-2xl font-bold text-primary">{formatCurrency(totalBalance)}</p>
+                <p className="text-2xl font-bold text-primary truncate">{formatCurrency(totalBalance)}</p>
                 <p className="text-xs text-muted-foreground mt-1">
                   Refletido no saldo geral da Home
                 </p>
@@ -164,8 +164,8 @@ export default function SalaryAccountsPage() {
               {activeAccounts.map(account => (
                 <Card key={account.id} className="overflow-hidden">
                   <CardContent className="py-4">
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1">
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
                           <Wallet className="h-5 w-5 text-primary" />
                           <h3 className="font-semibold">{account.name}</h3>
@@ -179,7 +179,7 @@ export default function SalaryAccountsPage() {
                             </span>
                           )}
                         </div>
-                        <p className="mt-2 text-lg font-bold">
+                        <p className="mt-2 text-lg font-bold truncate">
                           {formatCurrency(account.balance)}
                           <span className="text-xs font-normal text-muted-foreground ml-1">(calculado)</span>
                         </p>
