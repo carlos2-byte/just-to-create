@@ -8,7 +8,7 @@ const INTERSTITIAL_ID = 'ca-app-pub-2671131515539767/9244243541';
 const TEST_BANNER_ID = 'ca-app-pub-3940256099942544/6300978111';
 const TEST_INTERSTITIAL_ID = 'ca-app-pub-3940256099942544/1033173712';
 
-const isDebug = false; // ← true para testes
+const isDebug = true; // ← true para testes
 
 // ─── Timing ─────────────────────────────────────────────────
 const MIN_INTERVAL_MS = 8 * 60 * 1000; // 8 minutos
@@ -48,6 +48,10 @@ export async function initializeAdMob(): Promise<void> {
 }
 
 export async function showBanner(): Promise<void> {
+  // Banner desabilitado temporariamente para teste
+  console.log('[AdMob] showBanner chamado - mas banner está desabilitado para teste');
+  return;
+
   if (!AdMob || bannerShown) return;
 
   try {
